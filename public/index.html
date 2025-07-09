@@ -53,21 +53,7 @@
     <script src="script.js"></script>
 </body>
 </html>
-                    const endTime = Date.now();
-                    const timeElapsed = ((endTime - startTime) / 1000).toFixed(1);
-                    showSuccess(data.ingredients.replace(/\n/g, '<br>'));
-                    showStats(data.ingredients, timeElapsed);
-                } else {
-                    showError(data.error || 'Failed to analyze image.');
-                }
-            } catch (error) {
-                showError('Network error. Please try again.');
-                console.error('Error:', error);
-            } finally {
-                loading.style.display = 'none';
-                analyzeBtn.disabled = false;
-            }
-        });
+                    
     </script>
 </body>
 </html> 

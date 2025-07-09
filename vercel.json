@@ -1,19 +1,10 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+  "functions": {
+    "api/analyze-image.js": {
+      "maxDuration": 30
     },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index"
+    "api/index.js": {
+      "maxDuration": 10
     }
-  ]
+  }
 } 
