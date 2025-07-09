@@ -55,7 +55,7 @@ app.get('/', (req, res) => {
 });
 
 // Upload image and analyze ingredients
-app.post('/analyze-image', upload.single('image'), async (req, res) => {
+app.post('/api/analyze-image', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file uploaded' });

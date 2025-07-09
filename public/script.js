@@ -80,7 +80,7 @@ analyzeBtn.addEventListener('click', async () => {
     startTime = Date.now();
 
     try {
-        const response = await fetch('/analyze-image', {
+        const response = await fetch('/api/analyze-image', {
             method: 'POST',
             body: formData
         });
