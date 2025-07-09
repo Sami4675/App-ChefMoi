@@ -7,53 +7,94 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>🍽️ Ingredient Detector</h1>
-        
-        <div class="button-bar">
-            <button class="action-btn secondary" id="uploadBtn">
-                📷 Upload Image
-            </button>
-            <button class="action-btn" id="analyzeBtn" style="display: none;">
-                🔍 Analyze Ingredients
-            </button>
-            <button class="action-btn secondary" id="clearBtn" style="display: none;">
-                🗑️ Clear
-            </button>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🍽️ ChefMoi</h1>
         </div>
 
-        <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">📷</div>
-            <div class="upload-text">Click to upload or drag and drop an image</div>
-            <div class="upload-text" style="font-size: 0.9em; color: #999;">Supports JPG, PNG, GIF (max 5MB)</div>
-            <input type="file" id="fileInput" class="file-input" accept="image/*">
-        </div>
-
-        <div class="preview" id="preview"></div>
-
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p style="margin-top: 15px; color: #666;">Analyzing your image...</p>
-        </div>
-
-        <div class="stats" id="stats">
-            <div class="stat-item">
-                <div class="stat-number" id="ingredientCount">0</div>
-                <div class="stat-label">Ingredients Found</div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Camera Section -->
+            <div class="camera-section">
+                <div class="camera-icon" id="cameraIcon">
+                    📷
+                </div>
+                <div class="camera-text">Appuyez pour prendre une photo</div>
+                <div class="camera-subtext">ou téléchargez depuis votre galerie</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-number" id="analysisTime">0s</div>
-                <div class="stat-label">Analysis Time</div>
+
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">Cliquez pour télécharger ou glissez une image</div>
+                <div class="upload-text" style="font-size: 0.9em; color: #999;">Formats JPG, PNG, GIF (max 5MB)</div>
+                <input type="file" id="fileInput" class="file-input" accept="image/*">
             </div>
+
+            <!-- Preview -->
+            <div class="preview" id="preview"></div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-btn" id="analyzeBtn" style="display: none;">
+                    🔍 Analyser
+                </button>
+                <button class="action-btn secondary" id="clearBtn" style="display: none;">
+                    🗑️ Effacer
+                </button>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: #666;">Analyse de votre image...</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats" id="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="ingredientCount">0</div>
+                    <div class="stat-label">Ingrédients</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="analysisTime">0s</div>
+                    <div class="stat-label">Temps</div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="result" id="result"></div>
         </div>
 
-        <div class="result" id="result">        </div>
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" id="homeNav">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Accueil</div>
+            </div>
+            <div class="nav-item" id="historyNav">
+                <div class="nav-icon">📋</div>
+                <div class="nav-label">Historique</div>
+            </div>
+            <div class="camera-btn" id="cameraBtn">
+                📷
+            </div>
+            <div class="nav-item" id="favoritesNav">
+                <div class="nav-icon">⭐</div>
+                <div class="nav-label">Favoris</div>
+            </div>
+            <div class="nav-item" id="settingsNav">
+                <div class="nav-icon">⚙️</div>
+                <div class="nav-label">Paramètres</div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
                     
-    </script>
+ 
 </body>
 </html> 

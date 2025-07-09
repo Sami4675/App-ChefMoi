@@ -23,6 +23,64 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
+// Function to get a random Moroccan food image
+function getRandomMoroccanImage() {
+  const moroccanImages = [
+    {
+      url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop',
+      alt: 'Tajine Marocain',
+      photographer: 'Unsplash',
+      unsplash_url: 'https://unsplash.com/photos/tajine-marocain'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=400&fit=crop',
+      alt: 'Couscous Traditionnel',
+      photographer: 'Unsplash',
+      unsplash_url: 'https://unsplash.com/photos/couscous-marocain'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&h=400&fit=crop',
+      alt: 'Pastilla Marocaine',
+      photographer: 'Unsplash',
+      unsplash_url: 'https://unsplash.com/photos/pastilla-marocaine'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=400&fit=crop',
+      alt: 'Harira Soupe',
+      photographer: 'Unsplash',
+      unsplash_url: 'https://unsplash.com/photos/harira-soupe'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop',
+      alt: 'Tajine de Poulet',
+      photographer: 'Unsplash',
+      unsplash_url: 'https://unsplash.com/photos/tajine-poulet'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=400&fit=crop',
+      alt: 'Couscous aux Légumes',
+      photographer: 'Unsplash',
+      unsplash_url: 'https://unsplash.com/photos/couscous-legumes'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&h=400&fit=crop',
+      alt: 'Pastilla aux Fruits de Mer',
+      photographer: 'Unsplash',
+      unsplash_url: 'https://unsplash.com/photos/pastilla-fruits-mer'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=400&fit=crop',
+      alt: 'Harira Traditionnelle',
+      photographer: 'Unsplash',
+      unsplash_url: 'https://unsplash.com/photos/harira-traditionnelle'
+    }
+  ];
+  
+  // Return a random image from the collection
+  const randomIndex = Math.floor(Math.random() * moroccanImages.length);
+  return moroccanImages[randomIndex];
+}
+
 // Vercel serverless function
 module.exports = async (req, res) => {
   // Enable CORS
@@ -72,7 +130,7 @@ module.exports = async (req, res) => {
             content: [
               {
                 type: "text",
-                text: "Analyze this image and identify all the food ingredients you can see. List them in a clear, organized format. If you see any packaged foods, try to identify the main ingredients from the packaging."
+                text: "Analysez cette image et identifiez tous les ingrédients alimentaires que vous pouvez voir. Ensuite, créez une recette marocaine traditionnelle utilisant ces ingrédients. Incluez :\n\n1. **Liste des Ingrédients** : Tous les ingrédients que vous pouvez identifier dans l'image\n2. **Recette Marocaine** : Un délicieux plat marocain traditionnel utilisant ces ingrédients\n3. **Instructions de Cuisine** : Instructions étape par étape à la manière marocaine\n4. **Conseils de Cuisine** : Techniques et conseils de cuisine marocaine traditionnelle\n\nRendez-le authentique et savoureux avec des épices marocaines et des méthodes de cuisine traditionnelles !"
               },
               {
                 type: "image_url",
@@ -83,7 +141,7 @@ module.exports = async (req, res) => {
             ]
           }
         ],
-        max_tokens: 500
+        max_tokens: 800
       });
 
       // Check if response has the expected structure and extract content safely
@@ -99,11 +157,29 @@ module.exports = async (req, res) => {
         throw new Error('Failed to parse API response');
       }
 
+      // Extract recipe name from the response for image search
+      let recipeName = 'Moroccan Recipe';
+      try {
+        const lines = ingredients.split('\n');
+        for (const line of lines) {
+          if (line.includes('**') && (line.toLowerCase().includes('recipe') || line.toLowerCase().includes('dish') || line.toLowerCase().includes('tagine') || line.toLowerCase().includes('couscous'))) {
+            recipeName = line.replace(/\*\*/g, '').trim();
+            break;
+          }
+        }
+      } catch (error) {
+        console.log('Could not extract recipe name, using default');
+      }
+
+      // Get a random Moroccan food image
+      const recipeImage = getRandomMoroccanImage();
+
       // Send the analysis result
       res.json({
         success: true,
         ingredients: ingredients,
-        filename: req.file.originalname
+        filename: req.file.originalname,
+        recipeImage: recipeImage
       });
 
     } catch (error) {
