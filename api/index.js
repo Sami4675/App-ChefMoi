@@ -15,6 +15,13 @@ module.exports = async (req, res) => {
   try {
     // Read the HTML file
     const htmlPath = path.join(process.cwd(), 'public', 'index.html');
+    console.log('Looking for HTML file at:', htmlPath);
+    
+    if (!fs.existsSync(htmlPath)) {
+      console.error('HTML file not found at:', htmlPath);
+      return res.status(404).json({ error: 'HTML file not found' });
+    }
+    
     const htmlContent = fs.readFileSync(htmlPath, 'utf8');
     
     // Set content type
@@ -22,6 +29,11 @@ module.exports = async (req, res) => {
     res.status(200).send(htmlContent);
   } catch (error) {
     console.error('Error serving HTML:', error);
-    res.status(500).json({ error: 'Failed to serve page' });
+    res.status(500).json({ 
+      error: 'Failed to serve page',
+      details: error.message,
+      cwd: process.cwd(),
+      files: fs.readdirSync(process.cwd())
+    });
   }
 }; 
