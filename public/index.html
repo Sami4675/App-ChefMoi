@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <title>Ingredient Detector</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="app-container">
         <!-- Header -->
-        <div class="header">
-            <h1>🍽️ ChefMoi</h1>
+        <div class="header" style="display: flex; align-items: center; gap: 10px; justify-content: center;">
+            <img src="images/LOGO2.png" alt="Logo ChefMoi" style="height: 75px;">
+            <h1>ChefMoi</h1>
         </div>
-
         <!-- Main Content -->
         <div class="main-content">
             <!-- Camera Section -->
@@ -29,7 +30,7 @@
                 <div class="upload-icon">📷</div>
                 <div class="upload-text">Cliquez pour télécharger ou glissez une image</div>
                 <div class="upload-text" style="font-size: 0.9em; color: #999;">Formats JPG, PNG, GIF (max 5MB)</div>
-                <input type="file" id="fileInput" class="file-input" accept="image/*">
+                <input type="file" id="fileInput" class="file-input" accept="image/*" capture="environment">
             </div>
 
             <!-- Preview -->
