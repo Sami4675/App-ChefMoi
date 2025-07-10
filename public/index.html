@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <title>Ingredient Detector</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -18,11 +18,10 @@
         <div class="main-content">
             <!-- Camera Section -->
             <div class="camera-section">
-                <div class="camera-icon" id="cameraIcon">
+                <label for="fileInput" class="camera-icon" id="cameraIcon" style="cursor:pointer;" aria-label="Prendre ou importer une photo">
                     📷
-                </div>
-                <div class="camera-text">Appuyez pour prendre une photo</div>
-                <div class="camera-subtext">ou téléchargez depuis votre galerie</div>
+                </label>
+                <div class="camera-text">Prendre une photo ou importer depuis la galerie</div>
             </div>
 
             <!-- Upload Area -->
@@ -30,7 +29,7 @@
                 <div class="upload-icon">📷</div>
                 <div class="upload-text">Cliquez pour télécharger ou glissez une image</div>
                 <div class="upload-text" style="font-size: 0.9em; color: #999;">Formats JPG, PNG, GIF (max 5MB)</div>
-                <input type="file" id="fileInput" class="file-input" accept="image/*" capture="environment">
+                <input type="file" id="fileInput" class="file-input" accept="image/*" capture="environment" aria-label="Prendre ou importer une photo">
             </div>
 
             <!-- Preview -->
@@ -95,7 +94,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-                    
- 
-</body>
-</html> 
