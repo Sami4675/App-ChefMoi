@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <title>Ingredient Detector</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="app-container">
@@ -15,44 +16,44 @@
             <h1>ChefMoi</h1>
         </div>
         <!-- Main Content -->
-        <div class="main-content">
+        <div class="main-content" id="main-content">
             <!-- Camera Section -->
             <div class="camera-section">
-                <label for="fileInput" class="camera-icon" id="cameraIcon" style="cursor:pointer;" aria-label="Prendre ou importer une photo">
-                    📷
+                <label for="fileInput" class="camera-icon" id="cameraIcon" style="cursor:pointer;" aria-label="Prendre ou importer une photo" tabindex="0" role="button">
+                    <i class="fa-solid fa-camera fa-lg" aria-hidden="true"></i>
                 </label>
                 <div class="camera-text">Prendre une photo ou importer depuis la galerie</div>
             </div>
 
             <!-- Upload Area -->
-            <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">📷</div>
+            <div class="upload-area" id="uploadArea" tabindex="0" role="button" aria-label="Zone de dépôt pour télécharger une image">
+                <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up fa-2x" aria-hidden="true"></i></div>
                 <div class="upload-text">Cliquez pour télécharger ou glissez une image</div>
                 <div class="upload-text" style="font-size: 0.9em; color: #999;">Formats JPG, PNG, GIF (max 5MB)</div>
                 <input type="file" id="fileInput" class="file-input" accept="image/*" capture="environment" aria-label="Prendre ou importer une photo">
             </div>
 
             <!-- Preview -->
-            <div class="preview" id="preview"></div>
+            <div class="preview" id="preview" aria-live="polite"></div>
 
             <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button class="action-btn" id="analyzeBtn" style="display: none;">
-                    🔍 Analyser
+            <div class="action-buttons" role="group" aria-label="Actions sur l'image">
+                <button class="action-btn" id="analyzeBtn" style="display: none;" aria-label="Analyser l'image" tabindex="0">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Analyser
                 </button>
-                <button class="action-btn secondary" id="clearBtn" style="display: none;">
-                    🗑️ Effacer
+                <button class="action-btn secondary" id="clearBtn" style="display: none;" aria-label="Effacer l'image sélectionnée" tabindex="0">
+                    <i class="fa-solid fa-trash" aria-hidden="true"></i> Effacer
                 </button>
             </div>
 
             <!-- Loading -->
-            <div class="loading" id="loading">
+            <div class="loading" id="loading" aria-live="polite" aria-busy="true">
                 <div class="spinner"></div>
                 <p style="margin-top: 15px; color: #666;">Analyse de votre image...</p>
             </div>
 
             <!-- Stats -->
-            <div class="stats" id="stats">
+            <div class="stats" id="stats" aria-label="Statistiques d'analyse" role="region">
                 <div class="stat-item">
                     <div class="stat-number" id="ingredientCount">0</div>
                     <div class="stat-label">Ingrédients</div>
@@ -64,31 +65,37 @@
             </div>
 
             <!-- Results -->
-            <div class="result" id="result"></div>
+            <div class="result" id="result" aria-live="polite"></div>
         </div>
+        <!-- Page Historique -->
+        <div class="history-section page-section" id="historySection" style="display:none;" aria-label="Historique des analyses" tabindex="0"></div>
+        <!-- Page Favoris -->
+        <div class="favorites-section page-section" id="favoritesSection" style="display:none;" aria-label="Favoris" tabindex="0"></div>
+        <!-- Page Paramètres -->
+        <div class="settings-section page-section" id="settingsSection" style="display:none;" aria-label="Paramètres" tabindex="0"></div>
 
         <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <div class="nav-item active" id="homeNav">
-                <div class="nav-icon">🏠</div>
+        <nav class="bottom-nav" role="navigation" aria-label="Navigation principale">
+            <div class="nav-item active" id="homeNav" tabindex="0" role="button" aria-label="Accueil">
+                <div class="nav-icon"><i class="fa-solid fa-house" aria-hidden="true"></i></div>
                 <div class="nav-label">Accueil</div>
             </div>
-            <div class="nav-item" id="historyNav">
-                <div class="nav-icon">📋</div>
+            <div class="nav-item" id="historyNav" tabindex="0" role="button" aria-label="Historique">
+                <div class="nav-icon"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i></div>
                 <div class="nav-label">Historique</div>
             </div>
-            <div class="camera-btn" id="cameraBtn">
-                📷
+            <div class="camera-btn" id="cameraBtn" tabindex="0" role="button" aria-label="Prendre une photo">
+                <i class="fa-solid fa-camera" aria-hidden="true"></i>
             </div>
-            <div class="nav-item" id="favoritesNav">
-                <div class="nav-icon">⭐</div>
+            <div class="nav-item" id="favoritesNav" tabindex="0" role="button" aria-label="Favoris">
+                <div class="nav-icon"><i class="fa-solid fa-star" aria-hidden="true"></i></div>
                 <div class="nav-label">Favoris</div>
             </div>
-            <div class="nav-item" id="settingsNav">
-                <div class="nav-icon">⚙️</div>
+            <div class="nav-item" id="settingsNav" tabindex="0" role="button" aria-label="Paramètres">
+                <div class="nav-icon"><i class="fa-solid fa-gear" aria-hidden="true"></i></div>
                 <div class="nav-label">Paramètres</div>
             </div>
-        </div>
+        </nav>
     </div>
 
     <script src="script.js"></script>
