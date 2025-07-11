@@ -114,16 +114,14 @@ module.exports = async (req, res) => {
       } catch (error) {
         console.log('Could not extract recipe name, using default');
       }
-
-      // Get a random Moroccan food image
-      const recipeImage = getRandomMoroccanImage();
+ 
 
       // Send the analysis result
       res.json({
         success: true,
         ingredients: ingredients,
         filename: req.file.originalname,
-        recipeImage: recipeImage
+     
       });
 
     } catch (error) {

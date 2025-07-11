@@ -77,7 +77,7 @@ app.post('/api/analyze-image', upload.single('image'), async (req, res) => {
 
     // Call OpenAI API to analyze the image
     const response = await openai.createChatCompletion({
-      model: "gpt-4o",  // Using gpt-4o which is more widely available
+      model: "gpt-4o",
       messages: [
         {
           role: "user",
