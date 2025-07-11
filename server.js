@@ -4,7 +4,6 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const { Configuration, OpenAIApi } = require('openai');
-const { createApi } = require('unsplash-js');
 require('dotenv').config();
 
 const app = express();
@@ -50,10 +49,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-// Unsplash API configuration
-const unsplash = createApi({
-  accessKey: process.env.UNSPLASH_ACCESS_KEY || 'edt5IaI4RtzARRx1Fxa_-Vw30J_BhFoJK5OZOpg4jyA',
-});
+// OpenAI is already configured above
 
 // Routes
 app.get('/', (req, res) => {
@@ -151,7 +147,7 @@ app.post('/api/analyze-image', upload.single('image'), async (req, res) => {
   }
 });
 
-// Generate meal image using Unsplash
+// Generate meal image using DALL-E 3
 app.post('/api/generate-image', async (req, res) => {
   try {
     const { recipeName, ingredients } = req.body;
@@ -160,90 +156,42 @@ app.post('/api/generate-image', async (req, res) => {
       return res.status(400).json({ error: 'Recipe name and ingredients are required' });
     }
 
-    // Create search terms for Moroccan food
-    const searchTerms = [
-      'moroccan food',
-      'moroccan cuisine',
-      'tagine',
-      'couscous',
-      'moroccan dish',
-      'arabic food',
-      'middle eastern food'
-    ];
-
-    // Try different search terms to find a good image
-    let imageUrl = null;
-    let photographer = 'Unsplash';
-    let unsplashUrl = '';
-
-    for (const term of searchTerms) {
-      try {
-        const result = await unsplash.search.getPhotos({
-          query: term,
-          page: 1,
-          perPage: 10,
-          orientation: 'landscape'
-        });
-
-        if (result.response && result.response.results && result.response.results.length > 0) {
-          // Get a random image from the results
-          const randomIndex = Math.floor(Math.random() * Math.min(5, result.response.results.length));
-          const photo = result.response.results[randomIndex];
-          
-          imageUrl = photo.urls.regular;
-          photographer = photo.user.name;
-          unsplashUrl = photo.links.html;
-          break;
-        }
-      } catch (searchError) {
-        console.log(`Search term "${term}" failed, trying next...`);
-        continue;
-      }
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ error: 'OpenAI API key not configured' });
     }
 
-    // Fallback to a curated list of Moroccan food images if Unsplash fails
-    if (!imageUrl) {
-      const fallbackImages = [
-        {
-          url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop',
-          alt: 'Tajine Marocain',
-          photographer: 'Unsplash',
-          unsplash_url: 'https://unsplash.com/photos/tajine-marocain'
-        },
-        {
-          url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800&h=400&fit=crop',
-          alt: 'Couscous Traditionnel',
-          photographer: 'Unsplash',
-          unsplash_url: 'https://unsplash.com/photos/couscous-marocain'
-        },
-        {
-          url: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&h=400&fit=crop',
-          alt: 'Pastilla Marocaine',
-          photographer: 'Unsplash',
-          unsplash_url: 'https://unsplash.com/photos/pastilla-marocaine'
-        },
-        {
-          url: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=400&fit=crop',
-          alt: 'Harira Soupe',
-          photographer: 'Unsplash',
-          unsplash_url: 'https://unsplash.com/photos/harira-soupe'
-        }
-      ];
-      
-      const randomFallback = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
-      imageUrl = randomFallback.url;
-      photographer = randomFallback.photographer;
-      unsplashUrl = randomFallback.unsplash_url;
-    }
+    // Create a prompt for DALL-E 3 to generate a Moroccan meal image
+    const prompt = `A simple, low-quality photograph of a traditional Moroccan dish: ${recipeName}. 
+    The image should show the meal on a rustic plate or traditional Moroccan tagine pot, 
+    with warm lighting and authentic presentation. The style should be realistic but not high-resolution, 
+    like a casual food photo taken with a basic camera. Include traditional Moroccan elements like 
+    colorful spices, herbs, or traditional serving dishes.`;
 
-    // Send the image URL
-    res.json({
-      success: true,
-      imageUrl: imageUrl,
-      recipeName: recipeName,
-      photographer: photographer,
-      unsplashUrl: unsplashUrl
+    // Generate image using DALL-E 3
+    const response = await openai.createImage({
+      model: "dall-e-3",
+      prompt: prompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "standard", // Use standard quality for lower resolution
+      style: "natural" // Natural style for realistic food photography
     });
+
+    if (response.data && response.data.data && response.data.data.length > 0) {
+      const imageUrl = response.data.data[0].url;
+      
+      // Send the generated image URL
+      res.json({
+        success: true,
+        imageUrl: imageUrl,
+        recipeName: recipeName,
+        photographer: 'DALL-E 3',
+        unsplashUrl: '', // No Unsplash URL since we're using DALL-E 3
+        generatedBy: 'AI Generated'
+      });
+    } else {
+      throw new Error('No image generated by DALL-E 3');
+    }
 
   } catch (error) {
     console.error('Error generating image:', error);
@@ -251,9 +199,15 @@ app.post('/api/generate-image', async (req, res) => {
     let errorMessage = 'Error generating image';
     let errorDetails = error.message;
     
-    if (error.message.includes('401')) {
+    if (error.response) {
+      // OpenAI API error
+      errorDetails = `API Error: ${error.response.status} - ${error.response.data?.error?.message || error.message}`;
+    } else if (error.message.includes('401')) {
       errorMessage = 'Invalid API key';
-      errorDetails = 'Please check your Unsplash API key';
+      errorDetails = 'Please check your OpenAI API key';
+    } else if (error.message.includes('content_policy_violation')) {
+      errorMessage = 'Content policy violation';
+      errorDetails = 'The generated content violates OpenAI\'s content policy';
     }
 
     res.status(500).json({ 

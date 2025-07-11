@@ -1,11 +1,13 @@
-# 🍽️ Ingredient Detector
+# 🍽️ ChefMoi - AI Recipe Generator
 
-An AI-powered web application that analyzes food images and identifies ingredients using OpenAI's GPT-4 Vision API.
+An AI-powered web application that analyzes food images, identifies ingredients, and generates traditional Moroccan recipes using OpenAI's GPT-4 Vision API and DALL-E 3.
 
 ## Features
 
 - 📷 Upload food images via drag & drop or file picker
 - 🤖 AI-powered ingredient analysis using GPT-4 Vision
+- 🍳 Automatic generation of traditional Moroccan recipes
+- 🎨 AI-generated meal images using DALL-E 3
 - 🎨 Beautiful, modern UI with responsive design
 - 📱 Mobile-friendly interface
 - ⚡ Real-time analysis with loading indicators
@@ -70,7 +72,8 @@ An AI-powered web application that analyzes food images and identifies ingredien
 ## API Endpoints
 
 - `GET /` - Serves the main application page
-- `POST /analyze-image` - Analyzes uploaded image and returns ingredients
+- `POST /api/analyze-image` - Analyzes uploaded image and returns Moroccan recipe
+- `POST /api/generate-image` - Generates meal image using DALL-E 3
 
 ## Error Handling
 
@@ -85,7 +88,7 @@ The application includes comprehensive error handling for:
 
 - **Backend**: Node.js, Express.js
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **AI**: OpenAI GPT-4 Vision API
+- **AI**: OpenAI GPT-4 Vision API, DALL-E 3
 - **File Upload**: Multer
 - **Styling**: Custom CSS with modern design
 
