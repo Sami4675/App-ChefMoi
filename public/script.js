@@ -594,13 +594,80 @@ window.removeHistory = function(id) {
 // Paramètres
 function renderSettingsPage() {
     const section = document.getElementById('settingsSection');
-    section.innerHTML = `<h2>Paramètres</h2>
+    // Récupérer les préférences
+    const lang = localStorage.getItem('lang') || 'fr';
+    const darkMode = localStorage.getItem('darkMode') === 'true';
+    section.innerHTML = `
+        <h2>${lang === 'fr' ? 'Paramètres' : 'Settings'}</h2>
         <ul class="settings-list">
-            <li>Vider l’historique <button onclick="clearHistory()">Vider</button></li>
-            <li>Vider les favoris <button onclick="clearFavorites()">Vider</button></li>
+            <li>
+                ${lang === 'fr' ? 'Langue' : 'Language'} :
+                <select id="langSelect">
+                    <option value="fr" ${lang === 'fr' ? 'selected' : ''}>Français</option>
+                    <option value="en" ${lang === 'en' ? 'selected' : ''}>English</option>
+                </select>
+            </li>
+            <li>
+                <span>${lang === 'fr' ? 'Mode sombre' : 'Dark mode'}</span>
+                <button id="darkModeBtn">${darkMode ? (lang === 'fr' ? 'Désactiver' : 'Disable') : (lang === 'fr' ? 'Activer' : 'Enable')}</button>
+            </li>
+            <li>${lang === 'fr' ? 'Vider l’historique' : 'Clear history'} <button onclick="clearHistory()">${lang === 'fr' ? 'Vider' : 'Clear'}</button></li>
+            <li>${lang === 'fr' ? 'Vider les favoris' : 'Clear favorites'} <button onclick="clearFavorites()">${lang === 'fr' ? 'Vider' : 'Clear'}</button></li>
         </ul>
-        <div style="color:#aaa;font-size:0.98em;text-align:center;margin-top:18px;">Plus d’options à venir…</div>`;
+        <div style="color:#aaa;font-size:0.98em;text-align:center;margin-top:18px;">${lang === 'fr' ? 'Plus d’options à venir…' : 'More options coming soon…'}</div>`;
+
+    // Ajout des listeners pour la langue et le mode sombre
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect) {
+        langSelect.addEventListener('change', (e) => {
+            localStorage.setItem('lang', e.target.value);
+            renderSettingsPage();
+            updateTextsForLang();
+        });
+    }
+    const darkModeBtn = document.getElementById('darkModeBtn');
+    if (darkModeBtn) {
+        darkModeBtn.addEventListener('click', () => {
+            const newMode = !(localStorage.getItem('darkMode') === 'true');
+            localStorage.setItem('darkMode', newMode);
+            applyDarkMode();
+            renderSettingsPage();
+        });
+    }
 }
+
+function applyDarkMode() {
+    const darkMode = localStorage.getItem('darkMode') === 'true';
+    if (darkMode) {
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+    }
+}
+
+// Change les textes principaux selon la langue
+function updateTextsForLang() {
+    const lang = localStorage.getItem('lang') || 'fr';
+    // Header
+    const h1 = document.querySelector('.header h1');
+    if (h1) h1.textContent = lang === 'fr' ? 'ChefMoi' : 'ChefMe';
+    // Navigation
+    const navLabels = [
+        {id: 'homeNav', fr: 'Accueil', en: 'Home'},
+        {id: 'historyNav', fr: 'Historique', en: 'History'},
+        {id: 'favoritesNav', fr: 'Favoris', en: 'Favorites'},
+        {id: 'settingsNav', fr: 'Paramètres', en: 'Settings'}
+    ];
+    navLabels.forEach(item => {
+        const nav = document.getElementById(item.id);
+        if (nav) {
+            const label = nav.querySelector('.nav-label');
+            if (label) label.textContent = lang === 'fr' ? item.fr : item.en;
+        }
+    });
+    // Autres textes dynamiques à adapter si besoin...
+}
+
 window.clearHistory = function() {
     localStorage.removeItem('history');
     renderHistoryPage();
