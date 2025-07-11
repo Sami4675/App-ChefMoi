@@ -23,6 +23,24 @@ let selectedFile = null;
 let startTime = null;
 
 // Wait for DOM to be fully loaded
+// Accessibilité : gestion clavier pour les éléments interactifs
+function addKeyboardAccessibility() {
+    const focusables = [
+        cameraIcon, uploadArea, analyzeBtn, clearBtn, cameraBtn,
+        homeNav, historyNav, favoritesNav, settingsNav
+    ];
+    focusables.forEach(el => {
+        if (el) {
+            el.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    el.click();
+                }
+            });
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Camera icon click
     if (cameraIcon) {
@@ -142,7 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
         historyNav.addEventListener('click', () => {
             setActiveNav(historyNav);
             // Show history (placeholder)
-            showError('Fonction historique bientôt disponible !');
         });
     }
 
@@ -150,7 +167,6 @@ document.addEventListener('DOMContentLoaded', function() {
         favoritesNav.addEventListener('click', () => {
             setActiveNav(favoritesNav);
             // Show favorites (placeholder)
-            showError('Fonction favoris bientôt disponible !');
         });
     }
 
@@ -158,37 +174,91 @@ document.addEventListener('DOMContentLoaded', function() {
         settingsNav.addEventListener('click', () => {
             setActiveNav(settingsNav);
             // Show settings (placeholder)
-            showError('Fonction paramètres bientôt disponible !');
         });
     }
+    addKeyboardAccessibility();
 });
 
-// File handling functions
-function handleFile(file) {
-    if (!file.type.startsWith('image/')) {
-        showError('Veuillez sélectionner un fichier image.');
+// Compression d’image à l’upload (avant analyse)
+async function compressImage(file, maxSize = 1024, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+                if (width > maxSize || height > maxSize) {
+                    if (width > height) {
+                        height = Math.round(height * (maxSize / width));
+                        width = maxSize;
+                    } else {
+                        width = Math.round(width * (maxSize / height));
+                        height = maxSize;
+                    }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                canvas.toBlob(blob => {
+                    if (blob) {
+                        resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+                    } else {
+                        reject(new Error('Compression échouée'));
+                    }
+                }, 'image/jpeg', quality);
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// Types d’images autorisés
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+const MAX_SIZE = 5 * 1024 * 1024; // 5 Mo
+
+async function handleFile(file) {
+    if (!file) {
+        showError('Aucun fichier sélectionné.');
         return;
     }
-
-    if (file.size > 5 * 1024 * 1024) {
+    if (!ALLOWED_TYPES.includes(file.type)) {
+        showError('Format non supporté. Seuls les fichiers JPG, PNG et GIF sont acceptés.');
+        return;
+    }
+    if (file.size > MAX_SIZE) {
         showError('La taille du fichier doit être inférieure à 5MB.');
         return;
     }
-
-    selectedFile = file;
-    showPreview(file);
-    if (analyzeBtn) analyzeBtn.style.display = 'flex';
-    if (clearBtn) clearBtn.style.display = 'flex';
-    if (uploadArea) uploadArea.classList.add('active');
-    hideResult();
-    hideStats();
+    // Vérification de l’extension (défense en profondeur)
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+        showError('Extension de fichier non autorisée.');
+        return;
+    }
+    try {
+        const compressed = await compressImage(file);
+        selectedFile = compressed;
+        showPreview(compressed);
+        showActionButtons();
+        if (uploadArea) uploadArea.classList.add('active');
+        hideResult();
+        hideStats();
+    } catch (e) {
+        showError('Erreur lors de la compression de l’image.');
+    }
 }
 
 function showPreview(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
         if (preview) {
-            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            preview.innerHTML = `<img src="${e.target.result}" alt="Preview" loading="lazy">`;
         }
     };
     reader.readAsDataURL(file);
@@ -219,33 +289,31 @@ function showStats(ingredients, time) {
 
 function showError(message) {
     if (result) {
-        result.innerHTML = `<span class="status-indicator error"></span><strong>Erreur :</strong> ${message}`;
-        result.className = 'result error';
+        result.innerHTML = `<div class="error" tabindex="0">${message}</div>`;
         result.style.display = 'block';
+        result.querySelector('.error').focus();
     }
 }
 
 function showSuccess(content, recipeImage) {
     if (result) {
-        let imageHtml = '';
-        if (recipeImage && recipeImage.url) {
-            imageHtml = `
-                <div class="recipe-image-container">
-                    <img src="${recipeImage.url}" alt="${recipeImage.alt || 'Recette Marocaine'}" class="recipe-image">
-                    <div class="image-credit">
-                        Photo par <a href="${recipeImage.unsplash_url}" target="_blank" rel="noopener">${recipeImage.photographer}</a> sur Unsplash
-                    </div>
-                </div>
-            `;
-        }
-        
-        result.innerHTML = `
-            <span class="status-indicator"></span><strong>✅ Recette Marocaine Prête !</strong>
-            ${imageHtml}
-            <div class="ingredients-list">${content}</div>
-        `;
-        result.className = 'result success';
+        let imgHtml = recipeImage ? `<img src="${recipeImage}" alt="Recette" style="max-width:100%;border-radius:10px;margin-bottom:10px;" loading="lazy">` : '';
+        result.innerHTML = `<div class="success" tabindex="0">${imgHtml}${content}</div>`;
         result.style.display = 'block';
+        result.querySelector('.success').focus();
+        saveToHistory(content, recipeImage);
+    }
+}
+
+// Animation pour apparition des boutons d’action
+function showActionButtons() {
+    if (analyzeBtn) {
+        analyzeBtn.style.display = 'flex';
+        analyzeBtn.style.animation = 'fadeInDown 0.5s';
+    }
+    if (clearBtn) {
+        clearBtn.style.display = 'flex';
+        clearBtn.style.animation = 'fadeInDown 0.5s';
     }
 }
 
@@ -258,4 +326,230 @@ function setActiveNav(navElement) {
     
     // Add active class to clicked nav item
     if (navElement) navElement.classList.add('active');
+} 
+
+// Historique et favoris (localStorage)
+function saveToHistory(ingredients, imageData) {
+    const history = JSON.parse(localStorage.getItem('history') || '[]');
+    const entry = {
+        id: Date.now(),
+        date: new Date().toLocaleString('fr-FR'),
+        ingredients,
+        image: imageData || null
+    };
+    history.unshift(entry);
+    localStorage.setItem('history', JSON.stringify(history.slice(0, 20)));
+}
+
+function getHistory() {
+    return JSON.parse(localStorage.getItem('history') || '[]');
+}
+
+function saveToFavorites(entry) {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    if (!favorites.find(e => e.id === entry.id)) {
+        favorites.unshift(entry);
+        localStorage.setItem('favorites', JSON.stringify(favorites.slice(0, 20)));
+    }
+}
+
+function removeFromFavorites(id) {
+    let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    favorites = favorites.filter(e => e.id !== id);
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+}
+
+function getFavorites() {
+    return JSON.parse(localStorage.getItem('favorites') || '[]');
+}
+
+function renderHistory() {
+    const section = document.getElementById('historySection');
+    const history = getHistory();
+    section.innerHTML = '<h2>Historique des analyses</h2>';
+    if (history.length === 0) {
+        section.innerHTML += '<div class="empty-list">Aucune analyse récente.</div>';
+        return;
+    }
+    section.innerHTML += '<ul class="history-list">' + history.map(entry =>
+        `<li><span>${entry.date} - ${entry.ingredients.split('<br>')[0]}</span>
+        <button class="fav-btn" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" onclick="addFavoriteFromHistory(${entry.id})"><i class="fa fa-star"></i></button>
+        <button class="share-btn" title="Partager" aria-label="Partager" onclick="shareEntry(${entry.id}, 'history')"><i class="fa fa-share"></i></button></li>`
+    ).join('') + '</ul>';
+}
+
+function renderFavorites() {
+    const section = document.getElementById('favoritesSection');
+    const favorites = getFavorites();
+    section.innerHTML = '<h2>Favoris</h2>';
+    if (favorites.length === 0) {
+        section.innerHTML += '<div class="empty-list">Aucun favori enregistré.</div>';
+        return;
+    }
+    section.innerHTML += '<ul class="favorites-list">' + favorites.map(entry =>
+        `<li><span>${entry.date} - ${entry.ingredients.split('<br>')[0]}</span>
+        <button class="remove-btn" title="Retirer des favoris" aria-label="Retirer des favoris" onclick="removeFavorite(${entry.id})"><i class="fa fa-trash"></i></button>
+        <button class="share-btn" title="Partager" aria-label="Partager" onclick="shareEntry(${entry.id}, 'favorites')"><i class="fa fa-share"></i></button></li>`
+    ).join('') + '</ul>';
+}
+
+window.addFavoriteFromHistory = function(id) {
+    const entry = getHistory().find(e => e.id === id);
+    if (entry) {
+        saveToFavorites(entry);
+        renderFavorites();
+    }
+};
+window.removeFavorite = function(id) {
+    removeFromFavorites(id);
+    renderFavorites();
+};
+
+window.shareEntry = function(id, type) {
+    const list = type === 'history' ? getHistory() : getFavorites();
+    const entry = list.find(e => e.id === id);
+    if (!entry) return;
+    const text = `Analyse ChefMoi (${entry.date}) :\n${entry.ingredients.replace(/<br>/g, '\n')}`;
+    if (navigator.share) {
+        navigator.share({
+            title: 'ChefMoi - Résultat d’analyse',
+            text
+        }).then(() => showShareFeedback('Partagé !'));
+    } else {
+        navigator.clipboard.writeText(text).then(() => showShareFeedback('Copié dans le presse-papier !'));
+    }
+};
+
+function showShareFeedback(msg) {
+    const feedback = document.createElement('div');
+    feedback.className = 'success';
+    feedback.textContent = msg;
+    document.body.appendChild(feedback);
+    setTimeout(() => feedback.remove(), 1800);
+}
+
+// Affichage/masquage des sections
+function showSection(sectionId) {
+    document.getElementById('main-content').style.display = 'none';
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('historySection').style.display = 'none';
+    document.getElementById('favoritesSection').style.display = 'none';
+    if (document.getElementById(sectionId)) {
+        document.getElementById(sectionId).style.display = 'block';
+    }
+}
+function showMainContent() {
+    document.getElementById('main-content').style.display = 'block';
+    document.getElementById('historySection').style.display = 'none';
+    document.getElementById('favoritesSection').style.display = 'none';
+}
+
+function renderHistoryPage() {
+    const section = document.getElementById('historySection');
+    const history = getHistory();
+    section.innerHTML = '<h2>Historique des analyses</h2>';
+    if (history.length === 0) {
+        section.innerHTML += '<div class="empty-list">Aucune analyse récente.</div>';
+        return;
+    }
+    section.innerHTML += '<ul class="list">' + history.map(entry =>
+        `<li>
+            <div><strong>Date :</strong> ${entry.date}</div>
+            ${entry.image ? `<img src="${entry.image}" alt="Image analyse" style="max-width:100px;max-height:80px;border-radius:8px;margin:8px 0;" loading="lazy">` : ''}
+            <div><strong>Ingrédients :</strong><br>${entry.ingredients}</div>
+            <div class="actions">
+                <button class="fav-btn" title="Ajouter aux favoris" aria-label="Ajouter aux favoris" onclick="addFavoriteFromHistory(${entry.id})"><i class="fa fa-star"></i> Favori</button>
+                <button class="share-btn" title="Partager" aria-label="Partager" onclick="shareEntry(${entry.id}, 'history')"><i class="fa fa-share"></i> Partager</button>
+                <button class="remove-btn" title="Supprimer" aria-label="Supprimer" onclick="removeHistory(${entry.id})"><i class="fa fa-trash"></i> Supprimer</button>
+            </div>
+        </li>`
+    ).join('') + '</ul>';
+}
+
+function renderFavoritesPage() {
+    const section = document.getElementById('favoritesSection');
+    const favorites = getFavorites();
+    section.innerHTML = '<h2>Favoris</h2>';
+    if (favorites.length === 0) {
+        section.innerHTML += '<div class="empty-list">Aucun favori enregistré.</div>';
+        return;
+    }
+    section.innerHTML += '<ul class="list">' + favorites.map(entry =>
+        `<li>
+            <div><strong>Date :</strong> ${entry.date}</div>
+            ${entry.image ? `<img src="${entry.image}" alt="Image favori" style="max-width:100px;max-height:80px;border-radius:8px;margin:8px 0;" loading="lazy">` : ''}
+            <div><strong>Ingrédients :</strong><br>${entry.ingredients}</div>
+            <div class="actions">
+                <button class="share-btn" title="Partager" aria-label="Partager" onclick="shareEntry(${entry.id}, 'favorites')"><i class="fa fa-share"></i> Partager</button>
+                <button class="remove-btn" title="Retirer des favoris" aria-label="Retirer des favoris" onclick="removeFavorite(${entry.id})"><i class="fa fa-trash"></i> Retirer</button>
+            </div>
+        </li>`
+    ).join('') + '</ul>';
+}
+
+window.removeHistory = function(id) {
+    let history = getHistory();
+    history = history.filter(e => e.id !== id);
+    localStorage.setItem('history', JSON.stringify(history));
+    renderHistoryPage();
+};
+
+// Paramètres
+function renderSettingsPage() {
+    const section = document.getElementById('settingsSection');
+    section.innerHTML = `<h2>Paramètres</h2>
+        <ul class="settings-list">
+            <li>Vider l’historique <button onclick="clearHistory()">Vider</button></li>
+            <li>Vider les favoris <button onclick="clearFavorites()">Vider</button></li>
+        </ul>
+        <div style="color:#aaa;font-size:0.98em;text-align:center;margin-top:18px;">Plus d’options à venir…</div>`;
+}
+window.clearHistory = function() {
+    localStorage.removeItem('history');
+    renderHistoryPage();
+    showShareFeedback('Historique vidé !');
+};
+window.clearFavorites = function() {
+    localStorage.removeItem('favorites');
+    renderFavoritesPage();
+    showShareFeedback('Favoris vidés !');
+};
+
+// Navigation events (remplacer)
+if (historyNav) {
+    historyNav.addEventListener('click', () => {
+        setActiveNav(historyNav);
+        hideAllSections();
+        renderHistoryPage();
+        document.getElementById('historySection').style.display = 'flex';
+    });
+}
+if (favoritesNav) {
+    favoritesNav.addEventListener('click', () => {
+        setActiveNav(favoritesNav);
+        hideAllSections();
+        renderFavoritesPage();
+        document.getElementById('favoritesSection').style.display = 'flex';
+    });
+}
+if (settingsNav) {
+    settingsNav.addEventListener('click', () => {
+        setActiveNav(settingsNav);
+        hideAllSections();
+        renderSettingsPage();
+        document.getElementById('settingsSection').style.display = 'flex';
+    });
+}
+if (homeNav) {
+    homeNav.addEventListener('click', () => {
+        setActiveNav(homeNav);
+        hideAllSections();
+        document.getElementById('main-content').style.display = 'block';
+    });
+}
+function hideAllSections() {
+    document.getElementById('main-content').style.display = 'none';
+    document.getElementById('historySection').style.display = 'none';
+    document.getElementById('favoritesSection').style.display = 'none';
+    document.getElementById('settingsSection').style.display = 'none';
 } 
