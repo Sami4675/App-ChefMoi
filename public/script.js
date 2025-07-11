@@ -369,7 +369,7 @@ async function generateRecipeImage(recipeName, ingredients) {
                     <h3 style="color: #2c5530; margin-bottom: 10px;">🍽️ ${recipeName}</h3>
                     <img src="${data.imageUrl}" alt="${recipeName}" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" loading="lazy">
                     <div style="margin-top: 8px; font-size: 0.8em; color: #666; font-style: italic;">
-                        🤖 Image générée par DALL-E 3
+                        🤖 Image générée par  Intelligence Artificielle
                     </div>
                 </div>`;
                 resultDiv.innerHTML += imageHtml;
