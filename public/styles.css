@@ -69,15 +69,15 @@ body {
 }
 
 .camera-icon {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     background: var(--primary-dark);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 20px;
-    font-size: 2em;
+    font-size: 1.5em;
     color: var(--light-color);
     box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
     cursor: pointer;
@@ -596,4 +596,262 @@ body {
 
 .ingredients-list li {
     margin-bottom: 5px;
+} 
+
+.error {
+    color: #fff;
+    background: #C1272D;
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin: 18px 0;
+    font-weight: 600;
+    font-size: 1.1em;
+    box-shadow: 0 2px 10px rgba(193, 39, 45, 0.15);
+    animation: fadeInDown 0.5s;
+    letter-spacing: 0.5px;
+}
+
+.success {
+    color: #fff;
+    background: var(--primary-color);
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin: 18px 0;
+    font-weight: 600;
+    font-size: 1.1em;
+    box-shadow: 0 2px 10px rgba(212, 175, 55, 0.15);
+    animation: fadeInDown 0.5s;
+    letter-spacing: 0.5px;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.action-btn, .action-btn.secondary {
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+    outline: none;
+}
+
+.action-btn:focus, .action-btn.secondary:focus {
+    box-shadow: 0 0 0 3px var(--primary-color), 0 2px 10px rgba(212, 175, 55, 0.15);
+    border: none;
+    transform: scale(1.04);
+}
+
+.upload-area, .camera-icon {
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.upload-area:focus, .camera-icon:focus {
+    outline: 2px solid var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-color), 0 2px 10px rgba(212, 175, 55, 0.15);
+} 
+
+.history-section, .favorites-section {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    padding: 20px 16px;
+    margin: 20px 0;
+    font-size: 1em;
+    color: var(--text-color);
+    max-height: 350px;
+    overflow-y: auto;
+    transition: box-shadow 0.2s;
+}
+
+.history-section h2, .favorites-section h2 {
+    font-family: var(--font-title);
+    font-size: 1.2em;
+    margin-bottom: 12px;
+    color: var(--primary-dark);
+}
+
+.history-list, .favorites-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.history-list li, .favorites-list li {
+    background: #f8f5f0;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 12px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.history-list li:last-child, .favorites-list li:last-child {
+    margin-bottom: 0;
+}
+
+.fav-btn, .remove-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.fav-btn:hover, .remove-btn:hover {
+    color: var(--secondary-color);
+    transform: scale(1.2);
+}
+
+.share-btn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: color 0.2s, transform 0.2s;
+}
+.share-btn:hover {
+    color: var(--primary-dark);
+    transform: scale(1.2);
+}
+
+.empty-list {
+    color: #aaa;
+    text-align: center;
+    font-size: 1em;
+    margin: 20px 0;
+} 
+
+.page-section {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 32px 20px 24px 20px;
+    margin: 30px auto 20px auto;
+    max-width: 420px;
+    min-height: 400px;
+    font-size: 1.08em;
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.page-section h2 {
+    font-family: var(--font-title);
+    font-size: 1.4em;
+    margin-bottom: 18px;
+    color: var(--primary-dark);
+    text-align: center;
+}
+.page-section .list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.page-section .list li {
+    background: #f8f5f0;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    position: relative;
+}
+.page-section .list li:last-child {
+    margin-bottom: 0;
+}
+.page-section .list .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+.page-section .list .actions button {
+    font-size: 1.1em;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: none;
+    background: var(--primary-color);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+.page-section .list .actions button:hover {
+    background: var(--secondary-color);
+    transform: scale(1.08);
+}
+.page-section .list .actions .remove-btn {
+    background: var(--secondary-color);
+}
+.page-section .list .actions .remove-btn:hover {
+    background: #a81d22;
+}
+.page-section .empty-list {
+    color: #aaa;
+    text-align: center;
+    font-size: 1.08em;
+    margin: 30px 0;
+}
+.settings-section {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 32px 20px 24px 20px;
+    margin: 30px auto 20px auto;
+    max-width: 420px;
+    min-height: 300px;
+    font-size: 1.08em;
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.settings-section h2 {
+    font-family: var(--font-title);
+    font-size: 1.4em;
+    margin-bottom: 18px;
+    color: var(--primary-dark);
+    text-align: center;
+}
+.settings-section .settings-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.settings-section .settings-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f5f0;
+    border-radius: 10px;
+    padding: 14px 12px;
+    font-size: 1.08em;
+}
+.settings-section .settings-list button {
+    font-size: 1em;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    background: var(--primary-color);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+.settings-section .settings-list button:hover {
+    background: var(--secondary-color);
+    transform: scale(1.08);
 } 
