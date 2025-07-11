@@ -36,11 +36,7 @@ module.exports = async (req, res) => {
     }
 
     // Create a prompt for DALL-E 3 to generate a Moroccan meal image
-    const prompt = `A realistic but slightly grainy photograph of a traditional Moroccan dish: ${recipeName}, as if taken in a casual home or local eatery. The food is served on a rustic plate, a traditional tagine pot, or a weathered brass tray, with warm, natural lighting that enhances its textures.
-
-Around the dish, include subtle Moroccan elements—like a sprinkle of spices (cumin, paprika, or saffron), fresh herbs (cilantro or parsley), olives, or a slice of lemon. The background hints at Moroccan decor (a textured tablecloth, a faded mosaic, or simple ceramic tiles), but remains unfocused to keep attention on the food.
-
-The style is candid and unfiltered—slightly imperfect, with steam rising, a utensil resting nearby, or crumbs on the table. Colors are earthy yet vibrant, avoiding artificial polish. The image should feel like a genuine snapshot of Moroccan home cooking.`;
+    const prompt = `Prompt: "Generate a high-resolution image of an authentic Moroccan dish. The dish should be traditional and represent the rich culinary heritage of Morocco. Include elements such as vibrant spices, fresh vegetables, and typical ingredients . The setting should reflect Moroccan culture, with decorative ceramic plates or traditional table settings. Ensure the colors are vivid and the presentation is visually appealing, showcasing the intricate details and textures of the food. The ambiance should evoke a sense of warmth and hospitality, characteristic of Moroccan dining."`;
 
     // Generate image using DALL-E 3
     const response = await openai.createImage({
