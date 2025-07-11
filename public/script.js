@@ -133,8 +133,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (response.ok) {
                     const endTime = Date.now();
                     const timeElapsed = ((endTime - startTime) / 1000).toFixed(1);
+                    
+                    // Extract recipe name from the response
+                    const recipeName = extractRecipeName(data.ingredients);
+                    
+                    // Show the initial result without generated image
                     showSuccess(data.ingredients.replace(/\n/g, '<br>'), data.recipeImage);
                     showStats(data.ingredients, timeElapsed);
+                    
+                    // Generate image for the recipe
+                    if (recipeName) {
+                        generateRecipeImage(recipeName, data.ingredients);
+                    }
                 } else {
                     showError(data.error || 'Échec de l\'analyse de l\'image.');
                 }
@@ -292,6 +302,90 @@ function showError(message) {
         result.innerHTML = `<div class="error" tabindex="0">${message}</div>`;
         result.style.display = 'block';
         result.querySelector('.error').focus();
+    }
+}
+
+// Extract recipe name from ChatGPT response
+function extractRecipeName(ingredients) {
+    const lines = ingredients.split('\n');
+    for (const line of lines) {
+        // Look for "Nom du Plat :" format
+        if (line.includes('**Nom du Plat :**')) {
+            const recipeName = line.replace('**Nom du Plat :**', '').trim();
+            if (recipeName && recipeName !== '') {
+                return recipeName;
+            }
+        }
+        // Fallback: look for lines with ** that contain dish names
+        if (line.includes('**') && (
+            line.toLowerCase().includes('tajine') || 
+            line.toLowerCase().includes('couscous') ||
+            line.toLowerCase().includes('pastilla') ||
+            line.toLowerCase().includes('harira') ||
+            line.toLowerCase().includes('kefta') ||
+            line.toLowerCase().includes('briouat') ||
+            line.toLowerCase().includes('tagine')
+        )) {
+            return line.replace(/\*\*/g, '').trim();
+        }
+    }
+    // Default fallback
+    return 'Plat Marocain';
+}
+
+// Generate recipe image using Replicate API
+async function generateRecipeImage(recipeName, ingredients) {
+    try {
+        // Show loading message for image generation
+        const resultDiv = result.querySelector('.success');
+        if (resultDiv) {
+            resultDiv.innerHTML += '<div class="image-loading" style="margin-top: 15px; text-align: center; color: #666;"><i class="fa-solid fa-spinner fa-spin"></i> Génération de l\'image de la recette...</div>';
+        }
+
+        const response = await fetch('/api/generate-image', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                recipeName: recipeName,
+                ingredients: ingredients
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            // Remove loading message and add the generated image
+            const loadingDiv = result.querySelector('.image-loading');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+            
+            // Add the generated image to the result
+            const resultDiv = result.querySelector('.success');
+            if (resultDiv) {
+                 const imageHtml = `<div style="margin-top: 15px; text-align: center;">
+                    <h3 style="color: #2c5530; margin-bottom: 10px;">🍽️ ${recipeName}</h3>
+                    <img src="${data.imageUrl}" alt="${recipeName}" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" loading="lazy">
+                </div>`;
+                resultDiv.innerHTML += imageHtml;
+            }
+        } else {
+            // Remove loading message and show error
+            const loadingDiv = result.querySelector('.image-loading');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+            console.error('Image generation failed:', data.error);
+        }
+    } catch (error) {
+        // Remove loading message and show error
+        const loadingDiv = result.querySelector('.image-loading');
+        if (loadingDiv) {
+            loadingDiv.remove();
+        }
+        console.error('Error generating image:', error);
     }
 }
 
