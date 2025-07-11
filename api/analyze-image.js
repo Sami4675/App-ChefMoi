@@ -74,7 +74,7 @@ module.exports = async (req, res) => {
             content: [
               {
                 type: "text",
-                text: "Analysez cette image et donnez-moi une recette marocaine simple et authentique.\n\n**Format de réponse :**\n\n**Nom du Plat :** [Nom spécifique en français - ex: Tajine de Poulet aux Olives, Couscous aux Légumes, Pastilla au Poulet]\n\n**Ingrédients :**\n- [Liste simple des ingrédients principaux]\n\n**Préparation :**\n1. [Étape 1 - simple et claire]\n2. [Étape 2 - simple et claire]\n3. [Étape 3 - simple et claire]\n\n**Conseil :** [Un seul conseil de cuisine marocaine]\n\nRépondez en français simple et court. Choisissez un plat marocain traditionnel spécifique (Tajine, Couscous, Pastilla, Harira, etc.)"
+                text: "Analyze the provided food image and generate a 100% authentic Moroccan recipe using ONLY visibly detected ingredients. If absolutely necessary, add THE BARE MINIMUM of staple ingredients to complete a traditional morrocan dish."
               },
               {
                 type: "image_url",
