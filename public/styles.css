@@ -27,6 +27,79 @@ body {
     overflow-x: hidden;
 }
 
+/* --- DARK MODE --- */
+body.dark-mode {
+    background: #181818;
+    color: #f8f8f8;
+}
+body.dark-mode .app-container {
+    background: #232323;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+body.dark-mode .header {
+    background: linear-gradient(135deg, #333 0%, #222 100%);
+    color: #f8f8f8;
+}
+body.dark-mode .main-content,
+body.dark-mode .result,
+body.dark-mode .stats,
+body.dark-mode .history-section,
+body.dark-mode .favorites-section,
+body.dark-mode .settings-section {
+    background: #232323;
+    color: #f8f8f8;
+}
+body.dark-mode .nav-item.active {
+    background: #333;
+}
+body.dark-mode .nav-label {
+    color: #bbb;
+}
+body.dark-mode .action-btn,
+body.dark-mode .action-btn.secondary {
+    color: #fff;
+    background: linear-gradient(135deg, #444 0%, #111 100%);
+}
+body.dark-mode .action-btn:hover,
+body.dark-mode .action-btn.secondary:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+body.dark-mode .upload-area {
+    background: #232323;
+    border-color: #444;
+}
+body.dark-mode .upload-area.dragover {
+    background: #181818;
+    border-color: #888;
+}
+body.dark-mode .preview img {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.7);
+}
+body.dark-mode .result {
+    background: #232323;
+    border-left: 5px solid #444;
+}
+body.dark-mode .success {
+    background: #1e2d1e;
+    border-left-color: #28a745;
+    color: #b6fcb6;
+}
+body.dark-mode .error {
+    background: #2d1e1e;
+    border-left-color: #e53e3e;
+    color: #fcb6b6;
+}
+body.dark-mode .stats {
+    background: #232323;
+}
+body.dark-mode .settings-list li,
+body.dark-mode .settings-list button,
+body.dark-mode .settings-list select {
+    background: #232323;
+    color: #f8f8f8;
+    border-color: #444;
+}
+
 /* Mobile App Container */
 .app-container {
     max-width: 414px;
